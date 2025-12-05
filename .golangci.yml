@@ -1,0 +1,37 @@
+
+version: "2"
+
+linters:
+  default: all
+
+  disable:
+    - depguard
+    - wsl
+    - revive
+    - ireturn
+
+  settings:
+    exhaustruct:
+      exclude:
+        - 'gorm\.io/gorm.Config'
+        - 'gorm\.io/gorm/clause\..*'
+        - 'github\.com/golang-jwt/jwt/v5\.RegisteredClaims'
+        - 'log/slog\.HandlerOptions'
+      allow-empty: true
+
+    wrapcheck:
+      report-internal-errors: false
+      ignore-package-globs:
+        - remind_map/*
+    depguard:
+      rules:
+        architecture-boundaries:
+          files:
+            - "**/application/usecase/**/*.go"
+            - "**/domain/**/*.go"
+            - "**/infrastructure/**/*.go"
+
+          deny:
+
+            - pkg: "log/slog"
+              desc: "Domain/UseCase層で直接ログを出力しないでください。Loggerインターフェース経由で行ってください。"
