@@ -65,7 +65,7 @@ func (s *JWTGenerator) ConfirmAccessToken(tokenString string) (string, error) {
 		jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Name}),
 	)
 
-	token, err := parser.Parse(tokenString, func(token *jwt.Token) (any, error) {
+	token, err := parser.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (any, error) {
 		return s.accessTokenSecret, nil
 	})
 	if err != nil {
@@ -87,11 +87,11 @@ func (s *JWTGenerator) ConfirmAccessToken(tokenString string) (string, error) {
 func (s *JWTGenerator) ConfirmRefreshToken(tokenString string) (*auth.Auth, error) {
 	parser := jwt.NewParser(
 		jwt.WithExpirationRequired(),
-		jwt.WithValidMethods([]string{jwt.SigningMethodES256.Name}),
+		jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Name}),
 	)
 
-	token, err := parser.Parse(tokenString, func(token *jwt.Token) (any, error) {
-		return s.accessTokenSecret, nil
+	token, err := parser.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (any, error) {
+		return s.refreshTokenSecret, nil
 	})
 	if err != nil {
 		if errors.Is(err, jwt.ErrTokenExpired) {

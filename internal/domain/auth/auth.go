@@ -9,13 +9,13 @@ type Auth struct {
 	Jti      string    `gorm:"type:char(36);unique"`
 }
 
-func NewAuth(userUUID uuid.UUID) (*Auth, error) {
+func NewAuth(userUUID uuid.UUID) *Auth {
 	jti := uuid.New()
 
 	return &Auth{
 		UserUUID: userUUID,
 		Jti:      jti.String(),
-	}, nil
+	}
 }
 
 func (a *Auth) Refresh() {

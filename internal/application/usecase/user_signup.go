@@ -66,10 +66,8 @@ func (u *SignUpUsecase) Execute(ctx context.Context, input SignUpRequest) (SignU
 			return err
 		}
 
-		newAuth, err := auth.NewAuth(newUser.UUID)
-		if err != nil {
-			return err
-		}
+		newAuth:= auth.NewAuth(newUser.UUID)
+		
 		err = u.authRepo.Save(ctx, newAuth)
 		if err != nil {
 			return err

@@ -61,10 +61,7 @@ func (u *UserLoginUsecase) Execute(ctx context.Context, input UserLoginRequest) 
 		return res, commons.NewUnAuthorizedError()
 	}
 
-	auth, err := auth.NewAuth(user.UUID)
-	if err != nil {
-		return res, errors.WithStack(err)
-	}
+	auth := auth.NewAuth(user.UUID)
 
 	u.txRepo.WithInTx(ctx, func(ctx context.Context) error {
 

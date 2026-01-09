@@ -1,6 +1,7 @@
 package presentation
 
 import (
+	"fmt"
 	"net/http"
 	"remind_map/internal/application/usecase"
 
@@ -40,6 +41,7 @@ func (h *UserHandler) SignUp(ctx *gin.Context) {
 
 		return
 	}
+	fmt.Println("req:", req)
 
 	res, err := h.signup.Execute(ctx.Request.Context(), req)
 	if err != nil {
