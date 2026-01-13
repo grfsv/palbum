@@ -49,32 +49,11 @@ func (u *SignUpUsecase) Execute(ctx context.Context, input SignUpRequest) (SignU
 	var res SignUpResponse
 
 	err := u.txRepo.WithInTx(ctx, func(ctx context.Context) error {
-		mail, err := user.NewMail(input.Mail)
+		newUser, err := u.newUserDomain(ctx, input)
 		if err != nil {
 			return err
 		}
-
-		exist, err := u.userRepo.ExistByMail(ctx, mail)
-		if err != nil {
-			return err
-		}
-
-		if exist {
-			return commons.NewConflictError("email already in use")
-		}
-
-		name, err := user.NewName(input.Name)
-		if err != nil {
-			return err
-		}
-
-		password, err := user.NewPassword(input.Password, u.passHasher)
-		if err != nil {
-			return err
-		}
-
-		newUser := user.NewUser(name, mail, password)
-
+		
 		err = u.userRepo.Create(ctx, newUser)
 		if err != nil {
 			return err
@@ -108,4 +87,32 @@ func (u *SignUpUsecase) Execute(ctx context.Context, input SignUpRequest) (SignU
 	})
 
 	return res, err
+}
+
+func (u *SignUpUsecase) newUserDomain(ctx context.Context, input SignUpRequest) (*user.User, error) {
+	mail, err := user.NewMail(input.Mail)
+	if err != nil {
+		return nil, err
+	}
+
+	exist, err := u.userRepo.ExistByMail(ctx, mail)
+	if err != nil {
+		return nil, err
+	}
+
+	if exist {
+		return nil, commons.NewConflictError("email already in use")
+	}
+
+	name, err := user.NewName(input.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	password, err := user.NewPassword(input.Password, u.passHasher)
+	if err != nil {
+		return nil, err
+	}
+
+	return user.NewUser(name, mail, password), nil
 }
