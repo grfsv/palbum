@@ -1,18 +1,18 @@
-package usecase
+package user
 
 import (
 	"context"
-	"remind_map/internal/application/service"
-	"remind_map/internal/domain/auth"
-	"remind_map/internal/domain/commons"
-	"remind_map/internal/domain/user"
+	"palbum/internal/application/service"
+	"palbum/internal/domain/auth"
+	"palbum/internal/domain/commons"
+	"palbum/internal/domain/user"
 
 	"github.com/cockroachdb/errors"
 )
 
 type UserLoginRequest struct {
-	Mail     string `json:"mail" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Mail     string `binding:"required" json:"mail"`
+	Password string `binding:"required" json:"password"`
 }
 
 type UserLoginResponse struct {
@@ -47,27 +47,31 @@ func NewUserLoginUsecase(
 func (u *UserLoginUsecase) Execute(ctx context.Context, input UserLoginRequest) (UserLoginResponse, error) {
 	var res UserLoginResponse
 
-	user, err := u.userRepo.FindByMail(ctx, input.Mail)
+	mail, err := user.NewMail(input.Mail)
+	if err != nil {
+		return res, err
+	}
+
+	user, err := u.userRepo.FindByMail(ctx, mail)
 	if err != nil {
 		if errors.Is(err, commons.ErrNotFound) {
 			return res, commons.NewUnAuthorizedError()
 		}
 
-		return res, errors.WithStack(err)
+		return res, err
 	}
 
-	err = u.passHasher.Compare(user.Password, input.Password)
+	err = u.passHasher.Compare(user.Password(), input.Password)
 	if err != nil {
 		return res, commons.NewUnAuthorizedError()
 	}
 
-	auth := auth.NewAuth(user.UUID)
+	auth := auth.NewAuth(user.UUID())
 
-	u.txRepo.WithInTx(ctx, func(ctx context.Context) error {
-
+	err = u.txRepo.WithInTx(ctx, func(ctx context.Context) error {
 		err = u.authRepo.Save(ctx, auth)
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 
 		refreshToken, err := u.tokenService.GenerateRefreshToken(auth)
@@ -77,16 +81,19 @@ func (u *UserLoginUsecase) Execute(ctx context.Context, input UserLoginRequest) 
 
 		accessToken, err := u.tokenService.GenerateAccessToken(auth)
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 
 		res = UserLoginResponse{
 			AccessToken:  accessToken,
 			RefreshToken: refreshToken,
 		}
-		return nil
 
+		return nil
 	})
+	if err != nil {
+		return res, err
+	}
 
 	return res, nil
 }

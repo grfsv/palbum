@@ -1,11 +1,11 @@
-package usecase
+package user
 
 import (
 	"context"
-	"remind_map/internal/application/service"
-	"remind_map/internal/domain/auth"
-	"remind_map/internal/domain/commons"
-	"remind_map/internal/domain/user"
+	"palbum/internal/application/service"
+	"palbum/internal/domain/auth"
+	"palbum/internal/domain/commons"
+	"palbum/internal/domain/user"
 )
 
 type SignUpUsecase struct {
@@ -49,25 +49,39 @@ func (u *SignUpUsecase) Execute(ctx context.Context, input SignUpRequest) (SignU
 	var res SignUpResponse
 
 	err := u.txRepo.WithInTx(ctx, func(ctx context.Context) error {
-		exist, err := u.userRepo.ExistByMail(ctx, input.Mail)
+		mail, err := user.NewMail(input.Mail)
 		if err != nil {
 			return err
 		}
+
+		exist, err := u.userRepo.ExistByMail(ctx, mail)
+		if err != nil {
+			return err
+		}
+
 		if exist {
 			return commons.NewConflictError("email already in use")
 		}
 
-		newUser, err := user.NewUser(input.Name, input.Mail, input.Password, u.passHasher)
+		name, err := user.NewName(input.Name)
 		if err != nil {
 			return err
 		}
+
+		password, err := user.NewPassword(input.Password, u.passHasher)
+		if err != nil {
+			return err
+		}
+
+		newUser := user.NewUser(name, mail, password)
+
 		err = u.userRepo.Create(ctx, newUser)
 		if err != nil {
 			return err
 		}
 
-		newAuth:= auth.NewAuth(newUser.UUID)
-		
+		newAuth := auth.NewAuth(newUser.UUID())
+
 		err = u.authRepo.Save(ctx, newAuth)
 		if err != nil {
 			return err
@@ -77,6 +91,7 @@ func (u *SignUpUsecase) Execute(ctx context.Context, input SignUpRequest) (SignU
 		if err != nil {
 			return err
 		}
+
 		accessToken, err := u.tokenService.GenerateAccessToken(newAuth)
 		if err != nil {
 			return err
@@ -85,8 +100,8 @@ func (u *SignUpUsecase) Execute(ctx context.Context, input SignUpRequest) (SignU
 		res = SignUpResponse{
 			AccessToken:  accessToken,
 			RefreshToken: refreshToken,
-			Name:         newUser.Name,
-			Mail:         newUser.Mail,
+			Name:         string(newUser.Name()),
+			Mail:         string(newUser.Mail()),
 		}
 
 		return nil

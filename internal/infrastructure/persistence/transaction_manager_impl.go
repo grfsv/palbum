@@ -2,7 +2,7 @@ package persistence
 
 import (
 	"context"
-	"remind_map/internal/domain/commons"
+	"palbum/internal/domain/commons"
 
 	"gorm.io/gorm"
 )

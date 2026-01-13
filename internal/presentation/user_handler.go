@@ -1,9 +1,8 @@
 package presentation
 
 import (
-	"fmt"
 	"net/http"
-	"remind_map/internal/application/usecase"
+	usecase "palbum/internal/application/usecase/user"
 
 	"github.com/gin-gonic/gin"
 )
@@ -41,7 +40,6 @@ func (h *UserHandler) SignUp(ctx *gin.Context) {
 
 		return
 	}
-	fmt.Println("req:", req)
 
 	res, err := h.signup.Execute(ctx.Request.Context(), req)
 	if err != nil {
@@ -78,7 +76,6 @@ func (h *UserHandler) Login(ctx *gin.Context) {
 }
 
 func (h *UserHandler) Logout(ctx *gin.Context) {
-
 	var req usecase.UserLogoutRequest
 
 	err := ctx.ShouldBindJSON(&req)
@@ -104,12 +101,14 @@ func (h *UserHandler) Refresh(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		h.errorHandler.HandleError(ctx, err)
+
 		return
 	}
 
 	res, err := h.refresh.Execute(ctx.Request.Context(), req)
 	if err != nil {
 		h.errorHandler.HandleError(ctx, err)
+
 		return
 	}
 

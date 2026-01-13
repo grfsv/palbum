@@ -1,19 +1,23 @@
 package user
 
 import (
+	"palbum/internal/domain/commons"
 	"regexp"
-	"remind_map/internal/domain/commons"
 	"strings"
 
-	"github.com/cockroachdb/errors"
 	"github.com/google/uuid"
 )
 
+type UUID uuid.UUID
+type Name string
+type Mail string
+type Password string
+
 type User struct {
-	UUID     uuid.UUID `gorm:"type:char(36);primaryKey"`
-	Name     string    `gorm:"type:varchar(255);not null"`
-	Mail     string    `gorm:"unique;not null;uniqueIndex"`
-	Password string    `gorm:"type:varchar(255);not null"`
+	uuid     UUID
+	name     Name
+	mail     Mail
+	password Password
 }
 
 const (
@@ -23,53 +27,44 @@ const (
 	PasswordMaxLength = 256
 )
 
-func NewUser(name string, mail string, password string, passHasher PasswordHasher) (*User, error) {
-	var errorList []error
+func NewUser(name Name, mail Mail, password Password) *User {
+	uuid := UUID(uuid.New())
 
+	return &User{
+		uuid:     uuid,
+		name:     name,
+		mail:     mail,
+		password: password,
+	}
+}
+
+func NewUserWithUUID(uuid UUID, name Name, mail Mail, password Password) *User {
+	return &User{
+		uuid:     uuid,
+		name:     name,
+		mail:     mail,
+		password: password,
+	}
+}
+
+func NewUUIDFromString(uuidStr string) (UUID, error) {
+	parsedUUID, err := uuid.Parse(uuidStr)
+	if err != nil {
+		return UUID(uuid.Nil), err
+	}
+
+	return UUID(parsedUUID), nil
+}
+
+func NewName(name string) (Name, error) {
 	trimmedName := strings.TrimSpace(name)
-	trimmedMail := strings.TrimSpace(mail)
-	trimmedPassword := strings.TrimSpace(password)
 
-	customErr := validateName(trimmedName)
-	if customErr != nil {
-		errorList = append(errorList, customErr)
+	err := validateName(trimmedName)
+	if err != nil {
+		return "", err
 	}
 
-	customErr = validateMail(trimmedMail)
-	if customErr != nil {
-		errorList = append(errorList, customErr)
-	}
-
-	customErr = validatePassword(trimmedPassword)
-	if customErr != nil {
-		errorList = append(errorList, customErr)
-	}
-
-	switch len(errorList) {
-	case 0:
-		hashed, err := passHasher.Hash(trimmedPassword)
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-
-		uuid, err := uuid.NewV7()
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-
-		return &User{
-			UUID:     uuid,
-			Name:     trimmedName,
-			Mail:     trimmedMail,
-			Password: hashed,
-		}, nil
-	case 1:
-		return nil, errorList[0]
-	default:
-		err := commons.NewMultipleValidationError(errorList)
-
-		return nil, err
-	}
+	return Name(trimmedName), nil
 }
 
 func validateName(name string) error {
@@ -84,6 +79,17 @@ func validateName(name string) error {
 	return nil
 }
 
+func NewMail(mail string) (Mail, error) {
+	trimmedMail := strings.TrimSpace(mail)
+
+	err := validateMail(trimmedMail)
+	if err != nil {
+		return "", err
+	}
+
+	return Mail(trimmedMail), nil
+}
+
 func validateMail(mail string) error {
 	ok := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`).MatchString(mail)
 	if !ok {
@@ -91,6 +97,22 @@ func validateMail(mail string) error {
 	}
 
 	return nil
+}
+
+func NewPassword(password string, passHasher PasswordHasher) (Password, error) {
+	trimmedPassword := strings.TrimSpace(password)
+
+	err := validatePassword(trimmedPassword)
+	if err != nil {
+		return "", err
+	}
+
+	hashed, err := passHasher.Hash(trimmedPassword)
+	if err != nil {
+		return "", err
+	}
+
+	return Password(hashed), nil
 }
 
 func validatePassword(password string) error {
@@ -103,4 +125,20 @@ func validatePassword(password string) error {
 	}
 
 	return nil
+}
+
+func (u *User) UUID() UUID {
+	return u.uuid
+}
+
+func (u *User) Name() Name {
+	return u.name
+}
+
+func (u *User) Mail() Mail {
+	return u.mail
+}
+
+func (u *User) Password() Password {
+	return u.password
 }

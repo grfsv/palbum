@@ -1,9 +1,10 @@
-package persistence
+package auth
 
 import (
 	"context"
-	"remind_map/internal/domain/auth"
-	"remind_map/internal/domain/commons"
+	"palbum/internal/domain/auth"
+	"palbum/internal/domain/commons"
+	"palbum/internal/infrastructure/persistence"
 
 	"github.com/cockroachdb/errors"
 	"gorm.io/gorm"
@@ -11,42 +12,46 @@ import (
 )
 
 type UserAuthRepositoryImpl struct {
-	*Database
+	*persistence.Database
 }
 
-func NewUserAuthRepositoryImpl(baseRepo *Database) auth.AuthRepository {
+func NewUserAuthRepositoryImpl(baseRepo *persistence.Database) auth.AuthRepository {
 	return &UserAuthRepositoryImpl{baseRepo}
 }
 
 func (r *UserAuthRepositoryImpl) Save(ctx context.Context, userAuth *auth.Auth) error {
 	db := r.GetDBFromContext(ctx)
 
-	err := gorm.G[auth.Auth](db, clause.OnConflict{
+	err := gorm.G[AuthEntity](db, clause.OnConflict{
 		Columns:   []clause.Column{{Name: "user_uuid"}},
 		DoUpdates: clause.AssignmentColumns([]string{"jti"}),
-	}).Create(ctx, userAuth)
+	}).Create(ctx, ToEntity(userAuth))
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
-	return errors.WithStack(err)
+	return nil
 }
 
 func (r *UserAuthRepositoryImpl) Delete(ctx context.Context, userAuth *auth.Auth) error {
 	db := r.GetDBFromContext(ctx)
 
-	count, err := gorm.G[auth.Auth](db).Where("user_uuid = ? AND jti = ?", userAuth.UserUUID, userAuth.Jti).Delete(ctx)
+	count, err := gorm.G[AuthEntity](db).Where("user_uuid = ? AND jti = ?", userAuth.UserUUID, userAuth.Jti).Delete(ctx)
 	if count == 0 {
 		return commons.ErrNotFound
 	}
 
-	return errors.WithStack(err)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	return nil
 }
 
 func (r *UserAuthRepositoryImpl) IsValidToken(ctx context.Context, userAuth *auth.Auth) (bool, error) {
 	db := r.GetDBFromContext(ctx)
 
-	_, err := gorm.G[auth.Auth](db).Where("user_uuid = ? AND jti = ?", userAuth.UserUUID, userAuth.Jti).First(ctx)
+	_, err := gorm.G[AuthEntity](db).Where("user_uuid = ? AND jti = ?", userAuth.UserUUID, userAuth.Jti).First(ctx)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return false, nil

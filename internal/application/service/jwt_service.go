@@ -1,7 +1,7 @@
 package service
 
 import (
-	"remind_map/internal/domain/auth"
+	"palbum/internal/domain/auth"
 )
 
 type TokenService interface {

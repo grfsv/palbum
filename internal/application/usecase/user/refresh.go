@@ -1,14 +1,14 @@
-package usecase
+package user
 
 import (
 	"context"
-	"remind_map/internal/application/service"
-	"remind_map/internal/domain/auth"
-	"remind_map/internal/domain/commons"
+	"palbum/internal/application/service"
+	"palbum/internal/domain/auth"
+	"palbum/internal/domain/commons"
 )
 
 type RefreshRequest struct {
-	RefreshToken string `json:"refreshToken" binding:"required"`
+	RefreshToken string `binding:"required" json:"refreshToken"`
 }
 type RefreshResponse struct {
 	AccessToken  string `json:"accessToken"`
@@ -41,18 +41,18 @@ func (u *RefreshUsecase) Execute(ctx context.Context, input RefreshRequest) (Ref
 		return res, err
 	}
 
-	u.authRepo.IsValidToken(ctx, auth)
 	isValid, err := u.authRepo.IsValidToken(ctx, auth)
 	if err != nil {
 		return res, err
 	}
+
 	if !isValid {
 		return res, commons.NewUnAuthorizedError()
 	}
 
-	u.txRepo.WithInTx(ctx, func(ctx context.Context) error {
-
+	err = u.txRepo.WithInTx(ctx, func(ctx context.Context) error {
 		auth.Refresh()
+
 		err = u.authRepo.Save(ctx, auth)
 		if err != nil {
 			return err
@@ -72,8 +72,12 @@ func (u *RefreshUsecase) Execute(ctx context.Context, input RefreshRequest) (Ref
 			AccessToken:  accessToken,
 			RefreshToken: refreshToken,
 		}
+
 		return nil
 	})
+	if err != nil {
+		return res, err
+	}
 
 	return res, nil
 }

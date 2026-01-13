@@ -1,10 +1,9 @@
 package middleware
 
 import (
-	"fmt"
-	"remind_map/internal/application/service"
-	"remind_map/internal/domain/commons"
-	"remind_map/internal/presentation"
+	"palbum/internal/application/service"
+	"palbum/internal/domain/commons"
+	"palbum/internal/presentation"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,7 +22,6 @@ func NewAuthMiddleware(tokenService service.TokenService, errorHandler *presenta
 
 func (m *AuthMiddleware) RequireAuth() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		fmt.Println("AuthMiddleware: RequireAuth called")
 		tokenString := ctx.GetHeader("Authorization")
 
 		tokenString, ok := trimPrefix(tokenString)

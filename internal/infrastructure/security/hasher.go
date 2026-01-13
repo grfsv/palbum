@@ -1,7 +1,7 @@
 package security
 
 import (
-	"remind_map/internal/domain/user"
+	"palbum/internal/domain/user"
 
 	"github.com/cockroachdb/errors"
 	"golang.org/x/crypto/bcrypt"
@@ -20,11 +20,11 @@ func (h *BcryptHasher) Hash(password string) (string, error) {
 	if err != nil {
 		return "", errors.WithStack(err)
 	}
-	
+
 	return string(hashedBytes), nil
 }
 
-func (h *BcryptHasher) Compare(hashedPassword, password string) error {
+func (h *BcryptHasher) Compare(hashedPassword user.Password, password string) error {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	if err != nil {
 		return errors.WithStack(err)

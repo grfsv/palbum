@@ -1,17 +1,17 @@
-package usecase
+package user
 
 import (
 	"context"
-	"remind_map/internal/application/service"
-	"remind_map/internal/domain/auth"
-	"remind_map/internal/domain/commons"
-	"remind_map/internal/domain/user"
+	"palbum/internal/application/service"
+	"palbum/internal/domain/auth"
+	"palbum/internal/domain/commons"
+	"palbum/internal/domain/user"
 
 	"github.com/cockroachdb/errors"
 )
 
 type UserLogoutRequest struct {
-	RefreshToken string `json:"refreshToken" binding:"required"`
+	RefreshToken string `binding:"required" json:"refreshToken"`
 }
 
 type UserLogoutUsecase struct {

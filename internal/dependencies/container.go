@@ -1,14 +1,16 @@
 package dependencies
 
 import (
-	"remind_map/internal/application/usecase"
-	"remind_map/internal/infrastructure/persistence"
-	"remind_map/internal/presentation"
-	"remind_map/internal/presentation/middleware"
-	"remind_map/internal/route"
+	application_user "palbum/internal/application/usecase/user"
+	"palbum/internal/infrastructure/persistence"
+	persistence_auth "palbum/internal/infrastructure/persistence/auth"
+	persistence_user "palbum/internal/infrastructure/persistence/user"
+	"palbum/internal/presentation"
+	"palbum/internal/presentation/middleware"
+	"palbum/internal/route"
 
-	"remind_map/internal/infrastructure/security"
-	"remind_map/internal/utils/log"
+	"palbum/internal/infrastructure/security"
+	"palbum/internal/utils/log"
 
 	"github.com/cockroachdb/errors"
 	"go.uber.org/dig"
@@ -46,15 +48,16 @@ func InitContainer() (*dig.Container, error) {
 		presentation.NewUserHandler,
 		presentation.NewErrorHandler,
 		persistence.NewBaseRepository,
-		persistence.NewUserRepositoryImpl,
-		persistence.NewUserAuthRepositoryImpl,
-		usecase.NewSignUpUsecase,
-		usecase.NewUserLoginUsecase,
-		usecase.NewUserLogoutUsecase,
-		usecase.NewRefreshUsecase,
+		persistence_user.NewUserRepositoryImpl,
+		persistence_auth.NewUserAuthRepositoryImpl,
+		application_user.NewSignUpUsecase,
+		application_user.NewUserLoginUsecase,
+		application_user.NewUserLogoutUsecase,
+		application_user.NewRefreshUsecase,
 		security.NewJWTService,
 		security.NewBcryptHasher,
 		middleware.NewAuthMiddleware,
+		middleware.NewRequestMiddleware,
 	}
 
 	for _, dependency := range dependencies {

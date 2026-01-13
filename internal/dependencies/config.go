@@ -2,9 +2,9 @@ package dependencies
 
 import (
 	"os"
-	"remind_map/internal/infrastructure/persistence"
-	"remind_map/internal/infrastructure/security"
-	"remind_map/internal/route"
+	"palbum/internal/infrastructure/persistence"
+	"palbum/internal/infrastructure/security"
+	"palbum/internal/route"
 
 	"github.com/cockroachdb/errors"
 	"go.uber.org/dig"

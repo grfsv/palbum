@@ -3,10 +3,11 @@ package security
 import (
 	"time"
 
-	"remind_map/internal/application/service"
+	"palbum/internal/application/service"
 
-	"remind_map/internal/domain/auth"
-	"remind_map/internal/domain/commons"
+	"palbum/internal/domain/auth"
+	"palbum/internal/domain/commons"
+	"palbum/internal/domain/user"
 
 	"github.com/cockroachdb/errors"
 	"github.com/golang-jwt/jwt/v5"
@@ -32,7 +33,7 @@ func NewJWTService(cfg *JWTConfig) service.TokenService {
 
 func (s *JWTGenerator) GenerateAccessToken(auth *auth.Auth) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
-		Subject:   auth.UserUUID.String(),
+		Subject:   uuid.UUID(auth.UserUUID()).String(),
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)),
 	})
 
@@ -46,8 +47,8 @@ func (s *JWTGenerator) GenerateAccessToken(auth *auth.Auth) (string, error) {
 
 func (s *JWTGenerator) GenerateRefreshToken(auth *auth.Auth) (string, error) {
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
-		Subject:   auth.UserUUID.String(),
-		ID:        auth.Jti,
+		Subject:   uuid.UUID(auth.UserUUID()).String(),
+		ID:        uuid.UUID(auth.Jti()).String(),
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(30 * 24 * time.Hour)),
 	})
 
@@ -106,13 +107,22 @@ func (s *JWTGenerator) ConfirmRefreshToken(tokenString string) (*auth.Auth, erro
 		return nil, commons.NewUnAuthorizedError()
 	}
 
-	userUUID, err := uuid.Parse(claims.Subject)
+	userUUIDStr, err := uuid.Parse(claims.Subject)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	return &auth.Auth{
-		UserUUID: userUUID,
-		Jti:      claims.ID,
-	}, nil
+	userUUID := user.UUID(userUUIDStr)
+
+	jti, err := auth.NewJtiFromString(claims.ID)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	newAuth := auth.NewAuthWithJti(
+		userUUID,
+		jti,
+	)
+
+	return newAuth, nil
 }

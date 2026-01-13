@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 	"net/http"
-	"remind_map/internal/dependencies"
-	"remind_map/internal/route"
+	"palbum/internal/dependencies"
+	"palbum/internal/route"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,7 +24,7 @@ func main() {
 			engin.GET("/health", func(c *gin.Context) {
 				c.JSON(http.StatusOK, gin.H{
 					"status":  "ok",
-					"message": "Remind Map API is running started",
+					"message": "palbum Map API is running started",
 				})
 			})
 

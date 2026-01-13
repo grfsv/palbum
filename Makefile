@@ -3,17 +3,17 @@
 # デフォルトターゲット
 help:
 	@echo "利用可能なコマンド:"
-	@echo "  make build         - アプリケーションをビルド"
-	@echo "  make run           - アプリケーションを起動"
-	@echo "  make test          - テストを実行"
-	@echo "  make clean         - ビルド成果物を削除"
-	@echo "  make docker-up     - Docker環境を起動"
-	@echo "  make docker-down   - Docker環境を停止"
-	@echo "  make migrate-create  - マイグレーション用SQLの作成"
-	@echo "  make migrate-up    - データベースマイグレーション実行"
-	@echo "  make migrate-reset - マイグレーションのリセット"
-	@echo "  make lint          - コードの静的解析"
-	@echo "  make fmt           - コードのフォーマット"
+	@echo "  make build          - アプリケーションをビルド"
+	@echo "  make run            - アプリケーションを起動"
+	@echo "  make test           - テストを実行"
+	@echo "  make clean          - ビルド成果物を削除"
+	@echo "  make docker-up      - Docker環境を起動"
+	@echo "  make docker-down    - Docker環境を停止"
+	@echo "  make migrate-create - マイグレーション用SQLの作成"
+	@echo "  make migrate-up     - データベースマイグレーション実行"
+	@echo "  make migrate-reset  - マイグレーションのリセット"
+	@echo "  make lint           - コードの静的解析"
+	@echo "  make fmt            - コードのフォーマット"
 
 # ビルド
 build:
