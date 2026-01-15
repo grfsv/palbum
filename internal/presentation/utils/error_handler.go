@@ -1,4 +1,4 @@
-package presentation
+package utils
 
 import (
 	"fmt"
@@ -26,7 +26,7 @@ func (h *ErrorHandler) HandleError(ctx *gin.Context, err error) {
 	h.logger.Error(
 		"An error occurred:",
 		"request_id", requestid.Get(ctx),
-		"error", err.Error(), // 短いエラーメッセージ
+		"error", err.Error(),
 		"stack_trace", fmt.Sprintf("%+v", err),
 	)
 
@@ -57,6 +57,24 @@ func (h *ErrorHandler) HandleError(ctx *gin.Context, err error) {
 				http.StatusUnauthorized,
 				gin.H{
 					"error": "unauthorized",
+				})
+		case commons.TypeForbidden:
+			ctx.JSON(
+				http.StatusForbidden,
+				gin.H{
+					"error": customErr.Error(),
+				})
+		case commons.TypeBadRequest:
+			ctx.JSON(
+				http.StatusBadRequest,
+				gin.H{
+					"error": customErr.Error(),
+				})
+		case commons.TypeInternal:
+			ctx.JSON(
+				http.StatusInternalServerError,
+				gin.H{
+					"error": "internal server error",
 				})
 		}
 

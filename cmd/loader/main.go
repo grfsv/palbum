@@ -12,8 +12,8 @@ import (
 
 func main() {
 	stmts, err := gormschema.New("mysql").Load(
-		&user.UserEntity{},
-		&auth.AuthEntity{},
+		&user.User{},
+		&auth.Auth{},
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to load gorm schema: %v\n", err)

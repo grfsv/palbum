@@ -25,8 +25,11 @@ linters:
 
     wrapcheck:
       report-internal-errors: false
+      ignore-sig-regexps:
+        - \.New.*Error\(
       ignore-package-globs:
         - palbum/*
+
 
     depguard:
       rules:
@@ -45,5 +48,8 @@ linters:
         linters:
           - forbidigo
       - path: internal/dependencies/
+        linters:
+          - forbidigo
+      - path: internal/domain/commons/errors.go
         linters:
           - forbidigo

@@ -7,6 +7,7 @@ import (
 	persistence_user "palbum/internal/infrastructure/persistence/user"
 	"palbum/internal/presentation"
 	"palbum/internal/presentation/middleware"
+	"palbum/internal/presentation/utils"
 	"palbum/internal/route"
 
 	"palbum/internal/infrastructure/security"
@@ -46,7 +47,7 @@ func InitContainer() (*dig.Container, error) {
 	dependencies := []any{
 		log.NewLogger,
 		presentation.NewUserHandler,
-		presentation.NewErrorHandler,
+		utils.NewErrorHandler,
 		persistence.NewBaseRepository,
 		persistence_user.NewUserRepositoryImpl,
 		persistence_auth.NewUserAuthRepositoryImpl,
