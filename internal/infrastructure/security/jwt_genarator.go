@@ -70,11 +70,7 @@ func (s *JWTGenerator) ConfirmAccessToken(tokenString string) (string, error) {
 		return s.accessTokenSecret, nil
 	})
 	if err != nil {
-		if errors.Is(err, jwt.ErrTokenExpired) {
-			return "", commons.NewUnAuthorizedError()
-		}
-
-		return "", errors.WithStack(err)
+		return "", commons.NewUnAuthorizedError(err)
 	}
 
 	claims, ok := token.Claims.(*jwt.RegisteredClaims)

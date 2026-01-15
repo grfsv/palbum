@@ -3,17 +3,18 @@ package middleware
 import (
 	"palbum/internal/application/service"
 	"palbum/internal/domain/commons"
-	"palbum/internal/presentation"
+	"palbum/internal/domain/user"
+	"palbum/internal/presentation/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
 type AuthMiddleware struct {
 	tokenService service.TokenService
-	errorHandler *presentation.ErrorHandler
+	errorHandler *utils.ErrorHandler
 }
 
-func NewAuthMiddleware(tokenService service.TokenService, errorHandler *presentation.ErrorHandler) *AuthMiddleware {
+func NewAuthMiddleware(tokenService service.TokenService, errorHandler *utils.ErrorHandler) *AuthMiddleware {
 	return &AuthMiddleware{
 		tokenService: tokenService,
 		errorHandler: errorHandler,
@@ -43,6 +44,25 @@ func (m *AuthMiddleware) RequireAuth() gin.HandlerFunc {
 		ctx.Set("userUUID", userUUID)
 		ctx.Next()
 	}
+}
+
+func MustGetUserUUID(ctx *gin.Context) user.UUID {
+	uuid, exists := ctx.Get("userUUID")
+	if !exists {
+		panic("userUUID not found in context")
+	}
+
+	uuidStr, ok := uuid.(string)
+	if !ok {
+		panic("invalid userUUID in context")
+	}
+
+	userUUID, err := user.NewUUIDFromString(uuidStr)
+	if err != nil {
+		panic("invalid userUUID in context")
+	}
+
+	return userUUID
 }
 
 func trimPrefix(tokenString string) (string, bool) {

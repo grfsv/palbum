@@ -22,7 +22,7 @@ func NewUserAuthRepositoryImpl(baseRepo *persistence.Database) auth.AuthReposito
 func (r *UserAuthRepositoryImpl) Save(ctx context.Context, userAuth *auth.Auth) error {
 	db := r.GetDBFromContext(ctx)
 
-	err := gorm.G[AuthEntity](db, clause.OnConflict{
+	err := gorm.G[Auth](db, clause.OnConflict{
 		Columns:   []clause.Column{{Name: "user_uuid"}},
 		DoUpdates: clause.AssignmentColumns([]string{"jti"}),
 	}).Create(ctx, ToEntity(userAuth))
@@ -36,7 +36,7 @@ func (r *UserAuthRepositoryImpl) Save(ctx context.Context, userAuth *auth.Auth) 
 func (r *UserAuthRepositoryImpl) Delete(ctx context.Context, userAuth *auth.Auth) error {
 	db := r.GetDBFromContext(ctx)
 
-	count, err := gorm.G[AuthEntity](db).Where("user_uuid = ? AND jti = ?", userAuth.UserUUID, userAuth.Jti).Delete(ctx)
+	count, err := gorm.G[Auth](db).Where("user_uuid = ? AND jti = ?", userAuth.UserUUID(), userAuth.Jti()).Delete(ctx)
 	if count == 0 {
 		return commons.ErrNotFound
 	}
@@ -51,7 +51,7 @@ func (r *UserAuthRepositoryImpl) Delete(ctx context.Context, userAuth *auth.Auth
 func (r *UserAuthRepositoryImpl) IsValidToken(ctx context.Context, userAuth *auth.Auth) (bool, error) {
 	db := r.GetDBFromContext(ctx)
 
-	_, err := gorm.G[AuthEntity](db).Where("user_uuid = ? AND jti = ?", userAuth.UserUUID, userAuth.Jti).First(ctx)
+	_, err := gorm.G[Auth](db).Where("user_uuid = ? AND jti = ?", userAuth.UserUUID, userAuth.Jti).First(ctx)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return false, nil
