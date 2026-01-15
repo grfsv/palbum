@@ -7,19 +7,19 @@ import (
 	"github.com/google/uuid"
 )
 
-type AuthEntity struct {
+type Auth struct {
 	UUID uuid.UUID `gorm:"type:char(36);primaryKey"`
 	Jti  uuid.UUID `gorm:"type:char(36);unique"`
 }
 
-func ToEntity(auth *auth.Auth) *AuthEntity {
-	return &AuthEntity{
+func ToEntity(auth *auth.Auth) *Auth {
+	return &Auth{
 		UUID: uuid.UUID(auth.UserUUID()),
 		Jti:  uuid.UUID(auth.Jti()),
 	}
 }
 
-func (e AuthEntity) ToDomain() (*auth.Auth, error) {
+func (e Auth) ToDomain() (*auth.Auth, error) {
 	userUUID, err := user.NewUUIDFromString(e.UUID.String())
 	if err != nil {
 		return nil, err

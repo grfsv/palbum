@@ -6,15 +6,15 @@ import (
 	"github.com/google/uuid"
 )
 
-type UserEntity struct {
+type User struct {
 	UUID     uuid.UUID `gorm:"type:char(36);primaryKey"`
 	Name     string    `gorm:"type:varchar(255);not null"`
 	Mail     string    `gorm:"unique;not null"`
 	Password string    `gorm:"type:varchar(255);not null"`
 }
 
-func ToEntity(user *user.User) *UserEntity {
-	return &UserEntity{
+func ToEntity(user *user.User) *User {
+	return &User{
 		UUID:     uuid.UUID(user.UUID()),
 		Name:     string(user.Name()),
 		Mail:     string(user.Mail()),
@@ -22,7 +22,7 @@ func ToEntity(user *user.User) *UserEntity {
 	}
 }
 
-func (e UserEntity) ToDomain() (*user.User, error) {
+func (e User) ToDomain() (*user.User, error) {
 	uuid, err := user.NewUUIDFromString(e.UUID.String())
 	if err != nil {
 		return nil, err

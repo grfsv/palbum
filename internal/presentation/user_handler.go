@@ -2,25 +2,26 @@ package presentation
 
 import (
 	"net/http"
-	usecase "palbum/internal/application/usecase/user"
+	"palbum/internal/application/usecase/user"
+	"palbum/internal/presentation/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
 type UserHandler struct {
-	signup       *usecase.SignUpUsecase
-	login        *usecase.UserLoginUsecase
-	logout       *usecase.UserLogoutUsecase
-	refresh      *usecase.RefreshUsecase
-	errorHandler *ErrorHandler
+	signup       *user.SignUpUsecase
+	login        *user.UserLoginUsecase
+	logout       *user.UserLogoutUsecase
+	refresh      *user.RefreshUsecase
+	errorHandler *utils.ErrorHandler
 }
 
 func NewUserHandler(
-	signup *usecase.SignUpUsecase,
-	login *usecase.UserLoginUsecase,
-	logout *usecase.UserLogoutUsecase,
-	refresh *usecase.RefreshUsecase,
-	errorHandler *ErrorHandler,
+	signup *user.SignUpUsecase,
+	login *user.UserLoginUsecase,
+	logout *user.UserLogoutUsecase,
+	refresh *user.RefreshUsecase,
+	errorHandler *utils.ErrorHandler,
 ) *UserHandler {
 	return &UserHandler{
 		signup:       signup,
@@ -32,7 +33,7 @@ func NewUserHandler(
 }
 
 func (h *UserHandler) SignUp(ctx *gin.Context) {
-	var req usecase.SignUpRequest
+	var req user.SignUpRequest
 
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
@@ -54,7 +55,7 @@ func (h *UserHandler) SignUp(ctx *gin.Context) {
 }
 
 func (h *UserHandler) Login(ctx *gin.Context) {
-	var req usecase.UserLoginRequest
+	var req user.UserLoginRequest
 
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
@@ -76,7 +77,7 @@ func (h *UserHandler) Login(ctx *gin.Context) {
 }
 
 func (h *UserHandler) Logout(ctx *gin.Context) {
-	var req usecase.UserLogoutRequest
+	var req user.UserLogoutRequest
 
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
@@ -96,7 +97,7 @@ func (h *UserHandler) Logout(ctx *gin.Context) {
 }
 
 func (h *UserHandler) Refresh(ctx *gin.Context) {
-	var req usecase.RefreshRequest
+	var req user.RefreshRequest
 
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {

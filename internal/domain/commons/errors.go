@@ -1,5 +1,7 @@
 package commons
 
+import "github.com/cockroachdb/errors"
+
 type ErrorType int
 
 const (
@@ -7,6 +9,9 @@ const (
 	TypeValidation
 	TypeConflict
 	TypeUnAuthorized
+	TypeForbidden
+	TypeBadRequest
+	TypeInternal
 )
 
 func (t ErrorType) String() string {
@@ -19,16 +24,21 @@ func (t ErrorType) String() string {
 		return "Conflict"
 	case TypeUnAuthorized:
 		return "UnAuthorized"
-	default:
-		return "Unknown"
+	case TypeForbidden:
+		return "Forbidden"
+	case TypeBadRequest:
+		return "BadRequest"
+	case TypeInternal:
+		return "Internal"
 	}
+
+	return "Unknown"
 }
 
 type CustomError struct {
 	Type    ErrorType
 	Message string
 	Cause   error
-	Object  any
 }
 
 func NewNotFoundError(message string) error {
@@ -36,7 +46,6 @@ func NewNotFoundError(message string) error {
 		Type:    TypeNotFound,
 		Message: message,
 		Cause:   nil,
-		Object:  nil,
 	}
 }
 
@@ -45,7 +54,6 @@ func NewValidationError(message string) error {
 		Type:    TypeValidation,
 		Message: message,
 		Cause:   nil,
-		Object:  nil,
 	}
 }
 
@@ -54,17 +62,47 @@ func NewConflictError(message string) error {
 		Type:    TypeConflict,
 		Message: message,
 		Cause:   nil,
-		Object:  nil,
 	}
 }
 
-func NewUnAuthorizedError() error {
+func NewUnAuthorizedError(err ...error) error {
 	return &CustomError{
 		Type:    TypeUnAuthorized,
 		Message: "unauthorized",
-		Cause:   nil,
-		Object:  nil,
+		Cause:   cause(err),
 	}
+}
+
+func NewForbiddenError(message string) error {
+	return &CustomError{
+		Type:    TypeForbidden,
+		Message: message,
+		Cause:   nil,
+	}
+}
+
+func NewBadRequestError(message string) error {
+	return &CustomError{
+		Type:    TypeBadRequest,
+		Message: message,
+		Cause:   nil,
+	}
+}
+
+func NewInternalError(message string, cause error) error {
+	return &CustomError{
+		Type:    TypeInternal,
+		Message: message,
+		Cause:   errors.WithStack(cause),
+	}
+}
+
+func cause(err []error) error {
+	if len(err) == 0 {
+		return nil
+	}
+
+	return errors.WithStack(err[0])
 }
 
 func (e *CustomError) Error() string {
