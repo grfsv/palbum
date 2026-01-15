@@ -51,7 +51,7 @@ docker-up:
 # Docker環境停止
 docker-down:
 	@echo "Stopping Docker environment..."
-	docker-compose down
+	docker-compose down -v
 
 # Docker環境再構築
 docker-rebuild:

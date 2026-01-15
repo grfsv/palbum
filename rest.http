@@ -1,14 +1,21 @@
 ###
+@accessToken = {{login.response.body.data.accessToken}}
+@refreshToken = {{login.response.body.data.refreshToken}}
+@code = {{friend_code.response.body.data.code}}
+
+###
+# @name signup
 POST http://127.0.0.1:8080/v1/auth/signup HTTP/1.1
 Content-Type: application/json
 
 {
   "name": "Test User",
-  "mail": "testuser@example.com",
+  "mail": "testuser@example1.com",
   "password": "testpassword123"
 }
 
 ###
+# @name login
 POST http://127.0.0.1:8080/v1/auth/login HTTP/1.1
 Content-Type: application/json
 
@@ -17,11 +24,36 @@ Content-Type: application/json
   "password": "testpassword123"
 }
 
+@accessToken = {{login.response.body.data.accessToken}}
+@refreshToken = {{login.response.body.data.refreshToken}}
+
+
 ###
 POST http://127.0.0.1:8080/v1/auth/logout HTTP/1.1
 Content-Type: application/json
 
 {
-  "mail": "testuser@example.com",
-  "password": "testpassword123"
+  "refreshToken": "{{refreshToken}}"
+}
+
+###
+# @name friend_code
+GET http://127.0.0.1:8080/v1/friend/code HTTP/1.1
+Authorization: Bearer {{accessToken}}
+
+@code = {{friend_code.response.body.data.code}}
+
+
+###
+POST http://127.0.0.1:8080/v1/friend/request/{{code}} HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+###
+PATCH http://127.0.0.1:8080/v1/friend/request/61da16a5-ee26-46df-9d2c-b97a0f9cf373 HTTP/1.1
+Content-Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "status": "accepted"
 }

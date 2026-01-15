@@ -1,9 +1,9 @@
 package route
 
 import (
-	"reflect"
 	"palbum/internal/presentation"
 	"palbum/internal/presentation/middleware"
+	"reflect"
 	"strings"
 
 	"github.com/gin-contrib/requestid"
@@ -16,7 +16,8 @@ import (
 type handlerParams struct {
 	dig.In
 
-	User *presentation.UserHandler
+	User   *presentation.UserHandler
+	Friend *presentation.FriendHandler
 }
 
 type middlewareParams struct {
@@ -69,6 +70,11 @@ func routing(engine *gin.Engine, params handlerParams, middleware *middleware.Au
 	private := v1engine.Group("/")
 	private.Use(middleware.RequireAuth())
 	{
-
+		friend := private.Group("/friend")
+		{
+			friend.GET("/code", params.Friend.GetFriendCode)
+			friend.POST("/request/:friend_code", params.Friend.RequestFriend)
+			friend.PATCH("/request/:request_uuid", params.Friend.UpdateRequestStatus)
+		}
 	}
 }
