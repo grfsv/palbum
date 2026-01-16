@@ -1,9 +1,11 @@
 package dependencies
 
 import (
+	application_friend "palbum/internal/application/usecase/friend"
 	application_user "palbum/internal/application/usecase/user"
 	"palbum/internal/infrastructure/persistence"
 	persistence_auth "palbum/internal/infrastructure/persistence/auth"
+	persistence_friend "palbum/internal/infrastructure/persistence/friend"
 	persistence_user "palbum/internal/infrastructure/persistence/user"
 	"palbum/internal/presentation"
 	"palbum/internal/presentation/middleware"
@@ -15,38 +17,18 @@ import (
 
 	"github.com/cockroachdb/errors"
 	"go.uber.org/dig"
-	"gorm.io/gorm"
 )
 
 func InitContainer() (*dig.Container, error) {
 	container := dig.New()
 
-	err := container.Provide(NewConfig)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	err = container.Provide(
-		func(cfg *persistence.DBConfig) *gorm.DB {
-			db, err := persistence.InitDB(cfg)
-			if err != nil {
-				panic(err)
-			}
-
-			return db
-		})
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	err = container.Provide(persistence.NewTransactionManager)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
 	dependencies := []any{
+		NewConfig,
+		persistence.InitDB,
+		persistence.NewTransactionManager,
 		log.NewLogger,
 		presentation.NewUserHandler,
+		presentation.NewFriendHandler,
 		utils.NewErrorHandler,
 		persistence.NewBaseRepository,
 		persistence_user.NewUserRepositoryImpl,
@@ -55,10 +37,17 @@ func InitContainer() (*dig.Container, error) {
 		application_user.NewUserLoginUsecase,
 		application_user.NewUserLogoutUsecase,
 		application_user.NewRefreshUsecase,
+		application_friend.NewFriendCodeUsecase,
+		application_friend.NewFriendRequestUsecase,
+		application_friend.NewRequestStatusUsecase,
+		persistence_friend.NewFriendshipRepositoryImpl,
+		persistence_friend.NewFriendCodeRepositoryImpl,
+		persistence_friend.NewFriendRequestRepositoryImpl,
 		security.NewJWTService,
 		security.NewBcryptHasher,
 		middleware.NewAuthMiddleware,
 		middleware.NewRequestMiddleware,
+		route.NewHandler,
 	}
 
 	for _, dependency := range dependencies {
@@ -66,11 +55,6 @@ func InitContainer() (*dig.Container, error) {
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
-	}
-
-	err = container.Provide(route.NewHandler)
-	if err != nil {
-		return nil, errors.WithStack(err)
 	}
 
 	return container, nil

@@ -9,6 +9,8 @@ require (
 	github.com/gin-gonic/gin v1.11.0
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/uuid v1.6.0
+	github.com/matoous/go-nanoid/v2 v2.1.0
+	github.com/pkg/errors v0.9.1
 )
 
 require (
@@ -57,7 +59,6 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.28 // indirect
 	github.com/microsoft/go-mssqldb v1.7.2 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
 	github.com/rogpeppe/go-internal v1.13.1 // indirect
 	github.com/spiffe/go-spiffe/v2 v2.5.0 // indirect

@@ -1,6 +1,7 @@
 package user
 
 import (
+	"database/sql/driver"
 	"palbum/internal/domain/commons"
 	"regexp"
 	"strings"
@@ -141,4 +142,8 @@ func (u *User) Mail() Mail {
 
 func (u *User) Password() Password {
 	return u.password
+}
+
+func (u UUID) Value() (driver.Value, error) {
+	return uuid.UUID(u).String(), nil
 }

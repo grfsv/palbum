@@ -1,0 +1,96 @@
+package friend
+
+import (
+	"palbum/internal/domain/friend"
+	"palbum/internal/domain/user"
+	"time"
+
+	"github.com/google/uuid"
+)
+
+type FriendCode struct {
+	UserUUID uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	Code     string    `gorm:"type:char(36);not null;unique"`
+}
+
+type FriendRequest struct {
+	RequestUUID uuid.UUID `gorm:"type:char(36);primaryKey;index"`
+	UserUUID    uuid.UUID `gorm:"type:char(36);not null;uniqueIndex:idx_friend"`
+	FriendUUID  uuid.UUID `gorm:"type:char(36);not null;uniqueIndex:idx_friend"`
+	Status      string    `gorm:"type:varchar(20);not null"`
+	RequestAt   time.Time `gorm:"not null"`
+}
+
+type Friendship struct {
+	UserUUID1  uuid.UUID `gorm:"type:char(36);not null;primaryKey;uniqueIndex"`
+	UserUUID2  uuid.UUID `gorm:"type:char(36);not null;primaryKey"`
+	FriendUUID uuid.UUID `gorm:"type:char(36);not null;index"`
+	AcceptedAt time.Time `gorm:"not null"`
+}
+
+func (fe *FriendCode) ToDomain() *friend.FriendCode {
+	return friend.ReconstructFriendCode(fe.UserUUID, fe.Code)
+}
+
+func (fre *FriendRequest) ToDomain() *friend.FriendRequest {
+	return friend.ReconstructFriendRequest(
+		fre.RequestUUID,
+		fre.UserUUID,
+		fre.FriendUUID,
+		fre.Status,
+		fre.RequestAt,
+	)
+}
+
+func (fe *Friendship) ToDomain() *friend.Friendship {
+	return friend.ReconstructFriendship(
+		fe.FriendUUID,
+		fe.UserUUID1,
+		fe.UserUUID2,
+		fe.AcceptedAt,
+	)
+}
+
+func ToFriendCodeEntity(code *friend.FriendCode) *FriendCode {
+	return &FriendCode{
+		UserUUID: uuid.UUID(code.UserUUID()),
+		Code:     code.Code(),
+	}
+}
+
+func ToFriendRequestEntity(request *friend.FriendRequest) *FriendRequest {
+	return &FriendRequest{
+		RequestUUID: uuid.UUID(request.RequestUUID()),
+		UserUUID:    uuid.UUID(request.FromUserID()),
+		FriendUUID:  uuid.UUID(request.ToUserID()),
+		Status:      string(request.Status()),
+		RequestAt:   request.RequestAt(),
+	}
+}
+
+func ToFriendshipEntity(friendship *friend.Friendship) *[]Friendship {
+	var entities []Friendship
+
+	friend := friendship.Friend()
+
+	ids := make([]user.UUID, 0, len(friend))
+	for userUUID := range friend {
+		ids = append(ids, userUUID)
+	}
+
+	entities = append(entities, Friendship{
+		FriendUUID: uuid.UUID(friendship.FriendUUID()),
+		UserUUID1:  uuid.UUID(ids[0]),
+		UserUUID2:  uuid.UUID(ids[1]),
+		AcceptedAt: friendship.AcceptedAt(),
+	})
+
+	entities = append(entities, Friendship{
+		FriendUUID: uuid.UUID(friendship.FriendUUID()),
+		UserUUID1:  uuid.UUID(ids[1]),
+		UserUUID2:  uuid.UUID(ids[0]),
+		AcceptedAt: friendship.AcceptedAt(),
+	})
+
+	return &entities
+}

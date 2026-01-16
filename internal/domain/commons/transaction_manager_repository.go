@@ -15,3 +15,4 @@ type txContextKey string
 const TxKey txContextKey = "gorm_tx_session"
 
 var ErrNotFound = errors.New("record not found")
+var ErrDuplicate = errors.New("conflict")
