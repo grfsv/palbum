@@ -33,6 +33,23 @@ func (r *UserRepositoryImpl) FindByID(ctx context.Context, uuid user.UUID) (*use
 	return record.ToDomain()
 }
 
+func (r *UserRepositoryImpl) ListInUUID(ctx context.Context, uuids []user.UUID) ([]*user.User, error) {
+	records, err := gorm.G[User](r.GetDBFromContext(ctx)).Where("uuid IN ?", uuids).Find(ctx)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	users := make([]*user.User, len(records))
+	for i, record := range records {
+		users[i], err = record.ToDomain()
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+	}
+
+	return users, nil
+}
+
 func (r *UserRepositoryImpl) FindByMail(ctx context.Context, mail user.Mail) (*user.User, error) {
 	db := r.GetDBFromContext(ctx)
 

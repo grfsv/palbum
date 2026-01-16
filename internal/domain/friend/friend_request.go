@@ -9,6 +9,13 @@ import (
 	"github.com/google/uuid"
 )
 
+type RequestCategory string
+
+const (
+	CategoryReceived RequestCategory = "received"
+	CategorySent     RequestCategory = "sent"
+)
+
 type RequestUUID uuid.UUID
 type Status string
 

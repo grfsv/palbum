@@ -4,6 +4,7 @@ import (
 	"context"
 	"palbum/internal/domain/commons"
 	"palbum/internal/domain/friend"
+	"palbum/internal/domain/user"
 	"palbum/internal/infrastructure/persistence"
 
 	"github.com/pkg/errors"
@@ -54,4 +55,32 @@ func (r *FriendRequestRepositoryImpl) FindByUUID(
 	}
 
 	return row.ToDomain(), nil
+}
+
+func (r *FriendRequestRepositoryImpl) FindByUserUUID(
+	ctx context.Context,
+	userUUID user.UUID,
+	category friend.RequestCategory,
+) ([]*friend.FriendRequest, error) {
+	var filter string
+
+	switch category {
+	case friend.CategorySent:
+		filter = "to_user_uuid = ?"
+	case friend.CategoryReceived:
+		filter = "from_user_uuid = ?"
+	}
+
+	rows, err := gorm.G[FriendRequest](r.GetDBFromContext(ctx)).
+		Where(filter, userUUID).Where("status = ?", friend.Pending).Find(ctx)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	requests := make([]*friend.FriendRequest, len(rows))
+	for i, row := range rows {
+		requests[i] = row.ToDomain()
+	}
+
+	return requests, nil
 }
