@@ -83,12 +83,12 @@ func (u *RequestStatusUsecase) persistTransaction(
 ) error {
 	return u.txRepo.WithInTx(ctx, func(txCtx context.Context) error {
 		if newFriendship != nil {
-			err := u.friendshipRepo.Save(txCtx, newFriendship)
+			err := u.friendshipRepo.Create(txCtx, newFriendship)
 			if err != nil {
 				return err
 			}
 		}
 
-		return u.requestRepo.Update(txCtx, req)
+		return u.requestRepo.ChangeStatus(txCtx, req)
 	})
 }

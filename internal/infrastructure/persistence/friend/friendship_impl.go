@@ -19,11 +19,15 @@ func NewFriendshipRepositoryImpl(baseRepo *persistence.Database) friend.Friendsh
 	return &FriendshipRepositoryImpl{baseRepo}
 }
 
-func (r *FriendshipRepositoryImpl) Save(ctx context.Context, friendship *friend.Friendship) error {
+func (r *FriendshipRepositoryImpl) Create(ctx context.Context, friendship *friend.Friendship) error {
 	entity := ToFriendshipEntity(friendship)
 
 	err := gorm.G[Friendship](r.GetDBFromContext(ctx)).CreateInBatches(ctx, entity, len(*entity))
 	if err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return commons.ErrDuplicate
+		}
+
 		return errors.WithStack(err)
 	}
 

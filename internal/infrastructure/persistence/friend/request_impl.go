@@ -31,9 +31,10 @@ func (r *FriendRequestRepositoryImpl) Create(ctx context.Context, request *frien
 
 	return nil
 }
-func (r *FriendRequestRepositoryImpl) Update(ctx context.Context, request *friend.FriendRequest) error {
+func (r *FriendRequestRepositoryImpl) ChangeStatus(ctx context.Context, request *friend.FriendRequest) error {
 	rowsAffected, err := gorm.G[FriendRequest](r.GetDBFromContext(ctx)).
-		Where("request_uuid = ?", request.RequestUUID()).Updates(ctx, *ToFriendRequestEntity(request))
+		Where("request_uuid = ?", request.RequestUUID()).
+		Update(ctx, "status", request.Status())
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -51,6 +52,10 @@ func (r *FriendRequestRepositoryImpl) FindByUUID(
 ) (*friend.FriendRequest, error) {
 	row, err := gorm.G[FriendRequest](r.GetDBFromContext(ctx)).Where("request_uuid = ?", requestUUID).First(ctx)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, commons.ErrNotFound
+		}
+
 		return nil, errors.WithStack(err)
 	}
 
@@ -66,15 +71,19 @@ func (r *FriendRequestRepositoryImpl) FindByUserUUID(
 
 	switch category {
 	case friend.CategorySent:
-		filter = "to_user_uuid = ?"
+		filter = "sender_uuid = ?"
 	case friend.CategoryReceived:
-		filter = "from_user_uuid = ?"
+		filter = "receiver_uuid = ?"
 	}
 
 	rows, err := gorm.G[FriendRequest](r.GetDBFromContext(ctx)).
 		Where(filter, userUUID).Where("status = ?", friend.Pending).Find(ctx)
 	if err != nil {
 		return nil, errors.WithStack(err)
+	}
+
+	if len(rows) == 0 {
+		return nil, commons.ErrNotFound
 	}
 
 	requests := make([]*friend.FriendRequest, len(rows))

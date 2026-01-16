@@ -50,6 +50,6 @@ func (c *FriendCode) UserUUID() user.UUID {
 	return c.userUUID
 }
 
-func (c *FriendCode) Code() string {
-	return string(c.code)
+func (c *FriendCode) Code() Code {
+	return c.code
 }

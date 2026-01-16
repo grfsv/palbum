@@ -14,11 +14,11 @@ type FriendCode struct {
 }
 
 type FriendRequest struct {
-	RequestUUID uuid.UUID `gorm:"type:char(36);primaryKey;index"`
-	UserUUID    uuid.UUID `gorm:"type:char(36);not null;uniqueIndex:idx_friend"`
-	FriendUUID  uuid.UUID `gorm:"type:char(36);not null;uniqueIndex:idx_friend"`
-	Status      string    `gorm:"type:varchar(20);not null"`
-	RequestAt   time.Time `gorm:"not null"`
+	RequestUUID  uuid.UUID `gorm:"type:char(36);primaryKey;index"`
+	SenderUUID   uuid.UUID `gorm:"type:char(36);not null;uniqueIndex:idx_friend"`
+	ReceiverUUID uuid.UUID `gorm:"type:char(36);not null;uniqueIndex:idx_friend"`
+	Status       string    `gorm:"type:varchar(20);not null"`
+	RequestAt    time.Time `gorm:"not null"`
 }
 
 type Friendship struct {
@@ -35,8 +35,8 @@ func (fe *FriendCode) ToDomain() *friend.FriendCode {
 func (fre *FriendRequest) ToDomain() *friend.FriendRequest {
 	return friend.ReconstructFriendRequest(
 		fre.RequestUUID,
-		fre.UserUUID,
-		fre.FriendUUID,
+		fre.SenderUUID,
+		fre.ReceiverUUID,
 		fre.Status,
 		fre.RequestAt,
 	)
@@ -54,17 +54,17 @@ func (fe *Friendship) ToDomain() *friend.Friendship {
 func ToFriendCodeEntity(code *friend.FriendCode) *FriendCode {
 	return &FriendCode{
 		UserUUID: uuid.UUID(code.UserUUID()),
-		Code:     code.Code(),
+		Code:     string(code.Code()),
 	}
 }
 
 func ToFriendRequestEntity(request *friend.FriendRequest) *FriendRequest {
 	return &FriendRequest{
-		RequestUUID: uuid.UUID(request.RequestUUID()),
-		UserUUID:    uuid.UUID(request.FromUserID()),
-		FriendUUID:  uuid.UUID(request.ToUserID()),
-		Status:      string(request.Status()),
-		RequestAt:   request.RequestAt(),
+		RequestUUID:  uuid.UUID(request.RequestUUID()),
+		SenderUUID:   uuid.UUID(request.FromUserID()),
+		ReceiverUUID: uuid.UUID(request.ToUserID()),
+		Status:       string(request.Status()),
+		RequestAt:    request.RequestAt(),
 	}
 }
 
