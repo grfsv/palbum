@@ -4,6 +4,7 @@ import (
 	"context"
 	"palbum/internal/domain/commons"
 	"palbum/internal/domain/friend"
+	"palbum/internal/domain/user"
 	"palbum/internal/infrastructure/persistence"
 
 	"github.com/pkg/errors"
@@ -27,6 +28,23 @@ func (r *FriendshipRepositoryImpl) Save(ctx context.Context, friendship *friend.
 	}
 
 	return nil
+}
+
+func (r *FriendshipRepositoryImpl) FindByUserUUID(
+	ctx context.Context,
+	userUUID user.UUID,
+) ([]*friend.Friendship, error) {
+	rows, err := gorm.G[Friendship](r.GetDBFromContext(ctx)).Where("user_uuid1 = ?", userUUID).Find(ctx)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	friendships := make([]*friend.Friendship, len(rows))
+	for i, row := range rows {
+		friendships[i] = row.ToDomain()
+	}
+
+	return friendships, nil
 }
 
 func (r *FriendshipRepositoryImpl) Delete(ctx context.Context, friendship *friend.Friendship) error {

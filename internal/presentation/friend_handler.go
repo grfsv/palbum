@@ -15,6 +15,7 @@ type FriendHandler struct {
 	friendCode    *usecase.FriendCodeUsecase
 	friendRequest *usecase.FriendRequestUsecase
 	requestStatus *usecase.RequestStatusUsecase
+	friendList    *usecase.FriendListUsecase
 	errorHandler  *utils.ErrorHandler
 }
 
@@ -22,12 +23,14 @@ func NewFriendHandler(
 	friendCode *usecase.FriendCodeUsecase,
 	friendRequest *usecase.FriendRequestUsecase,
 	requestStatus *usecase.RequestStatusUsecase,
+	friendList *usecase.FriendListUsecase,
 	errorHandler *utils.ErrorHandler,
 ) *FriendHandler {
 	return &FriendHandler{
 		friendCode:    friendCode,
 		friendRequest: friendRequest,
 		requestStatus: requestStatus,
+		friendList:    friendList,
 		errorHandler:  errorHandler,
 	}
 }
@@ -141,4 +144,23 @@ func (h *FriendHandler) UpdateRequestStatus(ctx *gin.Context) {
 	}
 
 	ctx.Status(http.StatusOK)
+}
+
+func (h *FriendHandler) GetFriendList(ctx *gin.Context) {
+	userUUID := middleware.MustGetUserUUID(ctx)
+
+	input := usecase.FriendListInput{
+		UserUUID: userUUID,
+	}
+
+	res, err := h.friendList.Execute(ctx.Request.Context(), input)
+	if err != nil {
+		h.errorHandler.HandleError(ctx, err)
+
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"data": res,
+	})
 }

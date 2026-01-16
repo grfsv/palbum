@@ -40,6 +40,7 @@ func InitContainer() (*dig.Container, error) {
 		application_friend.NewFriendCodeUsecase,
 		application_friend.NewFriendRequestUsecase,
 		application_friend.NewRequestStatusUsecase,
+		application_friend.NewFriendListUsecase,
 		persistence_friend.NewFriendshipRepositoryImpl,
 		persistence_friend.NewFriendCodeRepositoryImpl,
 		persistence_friend.NewFriendRequestRepositoryImpl,

@@ -72,6 +72,7 @@ func routing(engine *gin.Engine, params handlerParams, middleware *middleware.Au
 	{
 		friend := private.Group("/friend")
 		{
+			friend.GET("/", params.Friend.GetFriendList)
 			friend.GET("/code", params.Friend.GetFriendCode)
 			friend.POST("/request/:friend_code", params.Friend.RequestFriend)
 			friend.PATCH("/request/:request_uuid", params.Friend.UpdateRequestStatus)
