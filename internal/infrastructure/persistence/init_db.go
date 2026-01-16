@@ -25,10 +25,12 @@ func InitDB(cfg *DBConfig) (*gorm.DB, error) {
 		cfg.Name,
 	)
 
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	database, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		TranslateError: true,
+	})
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	return db, nil
+	return database, nil
 }

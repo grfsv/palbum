@@ -39,7 +39,7 @@ func (u *FriendCodeUsecase) Execute(ctx context.Context, input FriendCodeInput) 
 				return out, err
 			}
 
-			out.Code = newFriendCode.Code()
+			out.Code = string(newFriendCode.Code())
 
 			return out, nil
 		}
@@ -47,7 +47,7 @@ func (u *FriendCodeUsecase) Execute(ctx context.Context, input FriendCodeInput) 
 		return out, err
 	}
 
-	out.Code = friendCode.Code()
+	out.Code = string(friendCode.Code())
 
 	return out, nil
 }
