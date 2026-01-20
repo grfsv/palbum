@@ -8,56 +8,56 @@ import (
 	"github.com/google/uuid"
 )
 
-type FriendUUID uuid.UUID
-type Friend map[user.UUID]struct{}
+type FriendshipUUID uuid.UUID
 
 type Friendship struct {
-	friendUUID FriendUUID
-	friend     Friend
-	acceptedAt time.Time
+	friendshipUUID FriendshipUUID
+	userUUID       user.UUID
+	friendUUID     user.UUID
+	acceptedAt     time.Time
 }
 
 func NewFriendship(request *FriendRequest) *Friendship {
-	friendUUID := FriendUUID(uuid.New())
+	friendshipUUID := FriendshipUUID(uuid.New())
 
 	return &Friendship{
-		friendUUID: friendUUID,
-		friend: Friend{
-			request.fromUserID: {},
-			request.toUserID:   {},
-		},
-		acceptedAt: time.Now(),
+		friendshipUUID: friendshipUUID,
+		userUUID:       request.ToUserID(),
+		friendUUID:     request.FromUserID(),
+		acceptedAt:     time.Now(),
 	}
 }
 
 func ReconstructFriendship(
+	friendshipUUID uuid.UUID,
+	userUUID uuid.UUID,
 	friendUUID uuid.UUID,
-	userUUID1 uuid.UUID,
-	userUUID2 uuid.UUID,
 	acceptedAt time.Time,
 ) *Friendship {
 	return &Friendship{
-		friendUUID: FriendUUID(friendUUID),
-		friend: Friend{
-			user.UUID(userUUID1): {},
-			user.UUID(userUUID2): {},
-		},
-		acceptedAt: acceptedAt,
+		friendshipUUID: FriendshipUUID(friendshipUUID),
+		userUUID:       user.UUID(userUUID),
+		friendUUID:     user.UUID(friendUUID),
+		acceptedAt:     acceptedAt,
 	}
 }
 
-func (f *Friendship) Friend() Friend {
-	return f.friend
+func (f *Friendship) FriendshipUUID() FriendshipUUID {
+	return f.friendshipUUID
 }
 
-func (f *Friendship) FriendUUID() FriendUUID {
+func (f *Friendship) FriendUUID() user.UUID {
 	return f.friendUUID
+}
+
+func (f *Friendship) UserUUID() user.UUID {
+	return f.userUUID
 }
 
 func (f *Friendship) AcceptedAt() time.Time {
 	return f.acceptedAt
 }
 
-func (u FriendUUID) Value() (driver.Value, error) {
+func (u FriendshipUUID) Value() (driver.Value, error) {
 	return uuid.UUID(u).String(), nil
 }
