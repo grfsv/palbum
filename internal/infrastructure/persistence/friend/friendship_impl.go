@@ -38,7 +38,7 @@ func (r *FriendshipRepositoryImpl) FindByUserUUID(
 	ctx context.Context,
 	userUUID user.UUID,
 ) ([]*friend.Friendship, error) {
-	rows, err := gorm.G[Friendship](r.GetDBFromContext(ctx)).Where("user_uuid1 = ?", userUUID).Find(ctx)
+	rows, err := gorm.G[Friendship](r.GetDBFromContext(ctx)).Where("user_uuid = ?", userUUID).Find(ctx)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -53,7 +53,7 @@ func (r *FriendshipRepositoryImpl) FindByUserUUID(
 
 func (r *FriendshipRepositoryImpl) Delete(ctx context.Context, friendship *friend.Friendship) error {
 	row, err := gorm.G[Friendship](r.GetDBFromContext(ctx)).
-		Where("friend_uuid = ?", friendship.FriendUUID()).Delete(ctx)
+		Where("friendship_uuid = ?", friendship.FriendshipUUID()).Delete(ctx)
 	if err != nil {
 		return errors.WithStack(err)
 	}

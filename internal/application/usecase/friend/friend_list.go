@@ -2,7 +2,6 @@ package friend
 
 import (
 	"context"
-	"fmt"
 	"palbum/internal/domain/friend"
 	"palbum/internal/domain/user"
 
@@ -46,17 +45,9 @@ func (u *FriendListUsecase) Execute(ctx context.Context, input FriendListInput) 
 	}
 
 	userUUIDs := make([]user.UUID, 0, len(friendships))
-	for _, friendship := range friendships {
-		for userUUID := range friendship.Friend() {
-			if userUUID == input.UserUUID {
-				continue
-			}
-
-			userUUIDs = append(userUUIDs, userUUID)
-		}
+	for i, friendship := range friendships {
+		userUUIDs[i] = friendship.FriendUUID()
 	}
-
-	fmt.Println(userUUIDs)
 
 	users, err := u.userRepo.ListInUUID(ctx, userUUIDs)
 	if err != nil {
@@ -64,10 +55,10 @@ func (u *FriendListUsecase) Execute(ctx context.Context, input FriendListInput) 
 	}
 
 	out.Friends = make([]Friend, len(users))
-	for i, user := range users {
+	for i, member := range users {
 		out.Friends[i] = Friend{
-			UserUUID: uuid.UUID(user.UUID()).String(),
-			Username: string(user.Name()),
+			UserUUID: uuid.UUID(member.UUID()).String(),
+			Username: string(member.Name()),
 		}
 	}
 

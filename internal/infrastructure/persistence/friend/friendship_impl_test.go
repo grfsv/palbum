@@ -115,4 +115,23 @@ func TestFriendshipRepositoryImpl_FindByUserUUID(t *testing.T) {
 
 func TestFriendshipRepositoryImpl_Delete(t *testing.T) {
 	t.Parallel()
+
+	t.Run("Success: can delete data", func(t *testing.T) {
+		t.Parallel()
+		repo := setupFriendship(t)
+
+		friendUUID := uuid.New()
+		userUUID1 := uuid.New()
+		userUUID2 := uuid.New()
+
+		request := domain.ReconstructFriendship(
+			friendUUID,
+			userUUID1,
+			userUUID2,
+			time.Now(),
+		)
+		_ = repo.Create(t.Context(), request)
+		err := repo.Delete(t.Context(), request)
+		assert.NoError(t, err, "should not be error")
+	})
 }
