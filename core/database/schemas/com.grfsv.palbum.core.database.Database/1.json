@@ -1,0 +1,44 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "3a43310603cba22705eb6b9d4471f8bb",
+    "entities": [
+      {
+        "tableName": "Dtk",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`friendUuid` TEXT NOT NULL, `date` INTEGER NOT NULL, `dtk` TEXT NOT NULL, PRIMARY KEY(`friendUuid`, `date`))",
+        "fields": [
+          {
+            "fieldPath": "friendUuid",
+            "columnName": "friendUuid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dtk",
+            "columnName": "dtk",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "friendUuid",
+            "date"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3a43310603cba22705eb6b9d4471f8bb')"
+    ]
+  }
+}
