@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_auth_login_title">ログイン</string>
+    <string name="feature_auth_signup_title">新規登録</string>
+    <string name="feature_auth_email">メールアドレス</string>
+    <string name="feature_auth_password">パスワード</string>
+    <string name="feature_auth_name">名前</string>
+    <string name="feature_auth_login_button">ログイン</string>
+    <string name="feature_auth_signup_button">登録</string>
+    <string name="feature_auth_switch_to_signup">アカウントをお持ちでない方</string>
+    <string name="feature_auth_switch_to_login">既にアカウントをお持ちの方</string>
+</resources>
