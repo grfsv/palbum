@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"palbum/internal/infrastructure/persistence/auth"
+	"palbum/internal/infrastructure/persistence/dtk"
 	"palbum/internal/infrastructure/persistence/friend"
 	"palbum/internal/infrastructure/persistence/user"
 
@@ -18,9 +19,11 @@ func main() {
 		&friend.FriendCode{},
 		&friend.FriendRequest{},
 		&friend.Friendship{},
+		&dtk.DTK{},
 	)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to load gorm schema: %v\n", err)
+		_, _ = fmt.Fprintf(os.Stderr, "failed to load gorm schema: %v\n", err)
+
 		os.Exit(1)
 	}
 

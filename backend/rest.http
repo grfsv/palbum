@@ -1,16 +1,11 @@
 ###
-@accessToken = {{login.response.body.data.accessToken}}
-@refreshToken = {{login.response.body.data.refreshToken}}
-@code = {{friend_code.response.body.data.code}}
-
-###
 # @name signup
 POST http://127.0.0.1:8080/v1/auth/signup HTTP/1.1
 Content-Type: application/json
 
 {
   "name": "Test User",
-  "mail": "testuser@example1.com",
+  "mail": "testuser@example.com",
   "password": "testpassword123"
 }
 
@@ -24,11 +19,14 @@ Content-Type: application/json
   "password": "testpassword123"
 }
 
-@accessToken = {{login.response.body.data.accessToken}}
-@refreshToken = {{login.response.body.data.refreshToken}}
-
+> {%
+    // レスポンスからトークンを抽出し、グローバル変数にセットします
+    client.global.set("accessToken", response.body.data.accessToken);
+    client.global.set("refreshToken", response.body.data.refreshToken);
+%}
 
 ###
+# @name logout
 POST http://127.0.0.1:8080/v1/auth/logout HTTP/1.1
 Content-Type: application/json
 
@@ -41,17 +39,21 @@ Content-Type: application/json
 GET http://127.0.0.1:8080/v1/friend/code HTTP/1.1
 Authorization: Bearer {{accessToken}}
 
-@code = {{friend_code.response.body.data.code}}
-
+> {%
+    // フレンドコードをグローバル変数にセットします
+    client.global.set("code", response.body.data.code);
+%}
 
 ###
+# @name friend_request
 POST http://127.0.0.1:8080/v1/friend/request/{{code}} HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 ###
+# @name friend_request_accept
 PATCH http://127.0.0.1:8080/v1/friend/request/61da16a5-ee26-46df-9d2c-b97a0f9cf373 HTTP/1.1
-Content-Content-Type: application/json
+Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 {
@@ -62,4 +64,21 @@ Authorization: Bearer {{accessToken}}
 GET http://127.0.0.1:8080/v1/friend HTTP/1.1
 Authorization: Bearer {{accessToken}}
 
+### DTK Endpoints
+
 ###
+# @name my_dtk
+GET http://127.0.0.1:8080/v1/dtk/today HTTP/1.1
+Authorization: Bearer {{accessToken}}
+
+###
+GET http://127.0.0.1:8080/v1/dtk/friends HTTP/1.1
+Authorization: Bearer {{accessToken}}
+
+###
+GET http://127.0.0.1:8080/v1/dtk/friends?friend_uuid=61da16a5-ee26-46df-9d2c-b97a0f9cf373 HTTP/1.1
+Authorization: Bearer {{accessToken}}
+
+###
+GET http://127.0.0.1:8080/v1/dtk/friends?since=2026-01-18 HTTP/1.1
+Authorization: Bearer {{accessToken}}
