@@ -1,3 +1,4 @@
+# === Go (Backend) ===
 # Binaries
 *.exe
 *.exe~
@@ -23,17 +24,6 @@ go.work
 .env
 .env.local
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
 # Firebase credentials
 config/firebase-credentials.json
 
@@ -51,6 +41,31 @@ build-errors.log
 # Air
 tmp/
 
-*.md
-!README.md
-!/document/*
+# === Android ===
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+build/
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+.kotlin/
+
+# === Common ===
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
