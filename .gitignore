@@ -1,71 +1,85 @@
-# === Go (Backend) ===
-# Binaries
+# --- Go / Backend ---
+# Binaries and object files
+/backend/web
+/backend/loader
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
-main
-tmp/
 
-# Test binary
+# Test and coverage outputs
 *.test
-
-# Output of the go coverage tool
 *.out
 
-# Dependency directories
+# Dependency and Workspace
 vendor/
-
-# Go workspace file
 go.work
 
-# Environment variables
+# Hot reload (Air)
+tmp/
+
+# --- Android / Gradle ---
+# Gradle and Build outputs
+**/.gradle/
+**/build/
+**/captures/
+*.apk
+*.aar
+*.bundle
+
+# Android Studio / IntelliJ project files
+*.iml
+*.iws
+.navigation/
+externalNativeBuild/
+.cxx/
+local.properties
+
+# --- Environment & Configuration ---
+# Sensitive environment variables
 .env
 .env.local
 
 # Firebase credentials
 config/firebase-credentials.json
 
-# Logs
-*.log
-build-errors.log
-
-# Database
-*.db
-*.sqlite
-
-# Docker
-.dockerignore
-
-# Air
-tmp/
-
-# === Android ===
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-build/
-/captures
-.externalNativeBuild
-.cxx
-local.properties
-.kotlin/
-
-# === Common ===
-# IDE
-.vscode/
+# --- IDE / Editors ---
+# JetBrains IDEs (GoLand, Android Studio, etc.)
 .idea/
+
+# VS Code
+.vscode/
+
+# Temporary and swap files
 *.swp
 *.swo
 *~
+*.bin
+*.tab
+*.len
+*.values
+*.keystream
 
-# OS
+# --- Database & Logs ---
+# Databases
+*.db
+*.sqlite
+
+# Log files
+*.log
+build-errors.log
+
+# --- Documentation ---
+# Ignore all markdown except README and document folder
+*.md
+!README.md
+!/document/*
+
+# --- Docker ---
+# If you want to keep the file but ignore it in git (unusual, but based on your list)
+.dockerignore
+
+# --- OS Files ---
 .DS_Store
 Thumbs.db
