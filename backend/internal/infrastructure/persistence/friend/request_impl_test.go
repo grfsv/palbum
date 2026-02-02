@@ -28,7 +28,7 @@ func setupRequest(t *testing.T) domain.FriendRequestRepository {
 
 func createRequest(t *testing.T) *domain.FriendRequest {
 	t.Helper()
-	
+
 	fromUUID := user.UUID(uuid.New())
 	toUUID := user.UUID(uuid.New())
 

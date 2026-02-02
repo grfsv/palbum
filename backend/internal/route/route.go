@@ -18,6 +18,7 @@ type handlerParams struct {
 
 	User   *presentation.UserHandler
 	Friend *presentation.FriendHandler
+	DTK    *presentation.DTKHandler
 }
 
 type middlewareParams struct {
@@ -76,6 +77,12 @@ func routing(engine *gin.Engine, params handlerParams, middleware *middleware.Au
 			friend.GET("/code", params.Friend.GetFriendCode)
 			friend.POST("/request/:friend_code", params.Friend.RequestFriend)
 			friend.PATCH("/request/:request_uuid", params.Friend.UpdateRequestStatus)
+		}
+
+		dtk := private.Group("/dtk")
+		{
+			dtk.GET("/today", params.DTK.GetMyDTK)
+			dtk.GET("/friends", params.DTK.GetFriendDTKs)
 		}
 	}
 }

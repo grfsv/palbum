@@ -53,7 +53,7 @@ func (u *SignUpUsecase) Execute(ctx context.Context, input SignUpRequest) (SignU
 		if err != nil {
 			return err
 		}
-		
+
 		err = u.userRepo.Create(ctx, newUser)
 		if err != nil {
 			return err
